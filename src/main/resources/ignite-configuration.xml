@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd">
+    <bean class="org.apache.ignite.configuration.IgniteConfiguration">
+
+        <property name="peerClassLoadingEnabled" value="true"/>
+
+        <property name="dataStorageConfiguration">
+            <bean class="org.apache.ignite.configuration.DataStorageConfiguration">
+                <property name="defaultDataRegionConfiguration">
+                    <!--To change total ram size:-->
+                    <bean class="org.apache.ignite.configuration.DataRegionConfiguration">
+                        <!--change the default region configuration-->
+                        <property name="name" value="Default_Region"/>
+                        <!-- change the initial size of default region configuration to 100 MB -->
+                        <property name="initialSize" value="#{100 * 1024 * 1024}"/>
+                        <!-- change the max. size of default region configuration to 2 GB -->
+                        <property name="maxSize" value="#{1L * 1024 * 1024 * 1024}"/>
+                        <!--enable eviction policy for this region-->
+                        <property name="pageEvictionMode" value="RANDOM_LRU"/>
+                    </bean>
+                </property>
+
+                <!-- Also we can define several data region configuration -->
+                <property name="dataRegionConfigurations">
+                    <list>
+                        <!--
+                            Creates new data region named 40MB_Region_Eviction
+                        -->
+                        <bean class="org.apache.ignite.configuration.DataRegionConfiguration">
+                            <property name="name" value="40MB_Region_Eviction"/>
+                            <!-- Memory region of 20 MB initial size. -->
+                            <property name="initialSize" value="#{20 * 1024 * 1024}"/>
+                            <!-- Maximum size is 40 MB. -->
+                            <property name="maxSize" value="#{40 * 1024 * 1024}"/>
+                            <!-- Enabling eviction for this memory region -->
+                            <property name="pageEvictionMode" value="RANDOM_2_LRU"/>
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+        </property>
+
+        <property name="discoverySpi">
+            <bean class="org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi">
+                <property name="ipFinder">
+
+                    <bean class="org.apache.ignite.spi.discovery.tcp.ipfinder.multicast.TcpDiscoveryMulticastIpFinder">
+                        <property name="addresses">
+                            <list>
+                                <value>127.0.0.1:47500..47509</value>
+                            </list>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+</beans>
